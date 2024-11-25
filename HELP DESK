@@ -1,0 +1,109 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX 5 // Maximum size of the queue
+
+typedef struct {
+    int id;
+    char issue[100];
+} Request;
+
+Request queue[MAX];
+int front = -1, rear = -1;
+
+// Function to check if the queue is full
+int isFull() {
+    return (rear + 1) % MAX == front;
+}
+
+// Function to check if the queue is empty
+int isEmpty() {
+    return front == -1;
+}
+
+// Add a request to the queue
+void enqueue(int id, char issue[]) {
+    if (isFull()) {
+        printf("Help desk queue is full. Cannot add more requests.\n");
+        return;
+    }
+    if (isEmpty()) {
+        front = 0;
+    }
+    rear = (rear + 1) % MAX;
+    queue[rear].id = id;
+    strcpy(queue[rear].issue, issue);
+    printf("Request ID %d added to the queue.\n", id);
+}
+
+// Process a request from the queue
+void dequeue() {
+    if (isEmpty()) {
+        printf("Help desk queue is empty. No requests to process.\n");
+        return;
+    }
+    printf("Processing Request ID %d: %s\n", queue[front].id, queue[front].issue);
+    if (front == rear) {
+        front = rear = -1; // Reset the queue when empty
+    } else {
+        front = (front + 1) % MAX;
+    }
+}
+
+// Display all requests in the queue
+void displayQueue() {
+    if (isEmpty()) {
+        printf("Help desk queue is empty.\n");
+        return;
+    }
+    printf("Current Help Desk Queue:\n");
+    int i = front;
+    while (1) {
+        printf("Request ID %d: %s\n", queue[i].id, queue[i].issue);
+        if (i == rear) {
+            break;
+        }
+        i = (i + 1) % MAX;
+    }
+}
+
+int main() {
+    int choice, id;
+    char issue[100];
+
+    while (1) {
+        printf("\nHelp Desk Menu:\n");
+        printf("1. Add Request\n");
+        printf("2. Process Request\n");
+        printf("3. Display Requests\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+        case 1:
+            printf("Enter Request ID: ");
+            scanf("%d", &id);
+            getchar(); // To consume the newline character
+            printf("Enter Issue: ");
+            fgets(issue, sizeof(issue), stdin);
+            issue[strcspn(issue, "\n")] = 0; // Remove trailing newline
+            enqueue(id, issue);
+            break;
+        case 2:
+            dequeue();
+            break;
+        case 3:
+            displayQueue();
+            break;
+        case 4:
+            printf("Exiting Help Desk System. Goodbye!\n");
+            exit(0);
+        default:
+            printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
